@@ -29,7 +29,7 @@ func main() {
 		fmt.Println("  history - show the execution history")
 		fmt.Println("  show <id> - show the output from the process with the given id")
 		fmt.Println("  stop <id> - stop the background process with the given id")
-		fmt.Println("  start <command> - start the given command as a background process")
+		fmt.Println("  start <command/id> - start the given command as a background process")
 		fmt.Println("  status - show the current running processes")
 	} else if args[0] == "status" {
 		printRecordList(getActiveRecords())
@@ -37,6 +37,16 @@ func main() {
 		printRecordList(readHistory())
 	} else if args[0] == "start" {
 		command := strings.Join(args[1:], " ")
+		if v, err := strconv.Atoi(command); err == nil {
+			history := readHistory()
+			for i := 0; i < len(history); i++ {
+				record := history[i]
+				if record.id == v {
+					command = record.command
+					break
+				}
+			}
+		}
 		id := nextHistoryId()
 		pid := run(command, id)
 		writeTaskRecord(id, pid, command)
